@@ -50,7 +50,7 @@ pub(crate) use ::function_name::named;
 /// This macro is particularly useful for composing nested property,
 /// logging, or FFI key strings in a structured manner.
 macro_rules! concat_cstr {
-    ($base:expr $(, $segment:literal)+ $(,)?) => {{
+    ($base:expr $(, $segment:expr)+ $(,)?) => {{
         const BYTES: &[u8] = constcat::concat_slices!(
             [u8]:
             $base.to_bytes(),
@@ -64,8 +64,62 @@ macro_rules! concat_cstr {
             Err(_) => unreachable!(),
         }
     }};
+    ($base:expr) => {{
+        $base
+    }};
 }
 pub(crate) use concat_cstr;
+
+/// Converts a const-evaluable `&str` expression into a `&'static CStr`.
+///
+/// This macro appends a trailing NUL byte at compile time and validates the
+/// resulting byte string with [`CStr::from_bytes_with_nul`]. It is useful when a
+/// borrowed C string is needed for FFI-facing constants or static metadata, and
+/// the source value is available as compile-time string data.
+///
+/// Unlike a [`concat!`]-based implementation, the input does not need to be a
+/// string literal. It may be, for example, a `const` or `static` `&str`, provided
+/// the expression is valid in a const item context.
+///
+/// # Panics
+///
+/// Panics during const evaluation if the input contains an interior NUL byte.
+///
+/// # Examples
+///
+/// ```rust
+/// use std::ffi::CStr;
+///
+/// static LABEL: &str = "label";
+/// const LABEL_C: &CStr = str_to_cstr!(LABEL);
+///
+/// const PACKAGE_NAME_C: &CStr = str_to_cstr!(env!("CARGO_PKG_NAME"));
+/// ```
+///
+/// # Limitations
+///
+/// This macro does not allocate or copy at runtime. It cannot convert an
+/// arbitrary runtime `&str` into a C string; use [`CString`] for that.
+macro_rules! str_to_cstr {
+    ($str:expr) => {{
+        const STRREF: &str = $str;
+        const BYTES: &[u8] = constcat::concat_slices!(
+            [u8]:
+            STRREF.as_bytes(),
+            b"\0"
+        );
+
+        match ::std::ffi::CStr::from_bytes_with_nul(BYTES) {
+            Ok(c) => c,
+            Err(_) => panic!(concat!(
+                "str_to_cstr!: ",
+                stringify!($str),
+                " contains an interior NUL"
+            )),
+        }
+    }};
+}
+pub(crate) use str_to_cstr;
 
 /// Match on a `Result`, evaluating to the wrapped value if it is `Ok` or
 /// returning `ERROR_RET` (which must already be defined) if it is `Err`.

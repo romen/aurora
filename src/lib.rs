@@ -7,7 +7,7 @@ extern crate log;
 
 #[macro_use]
 mod helpers;
-pub(crate) use helpers::{concat_cstr, handleResult, log_target, named};
+pub(crate) use helpers::{concat_cstr, handleResult, log_target, named, str_to_cstr};
 
 pub(crate) mod adapters;
 pub(crate) mod forge;
@@ -74,11 +74,13 @@ impl<'a> Drop for ProviderInstance<'a> {
     }
 }
 
-pub static PROV_NAME: &str = env!("CARGO_PKG_NAME");
+//pub static PROV_NAME: &str = env!("CARGO_PKG_NAME");
+pub static PROV_NAME: &str = "aurora";
 pub static PROV_VER: &str = env!("CARGO_PKG_VERSION");
 pub static PROV_BUILDINFO: &str = env!("CARGO_GIT_DESCRIBE");
 
-const PROPERTY_DEFINITION: &CStr = c"provider=aurora,x.author=QUBIP";
+const PROPERTY_DEFINITION: &CStr =
+    concat_cstr!(c"provider=", str_to_cstr!(PROV_NAME), c",x.author=QUBIP");
 
 impl<'a> ProviderInstance<'a> {
     #[named]
