@@ -35,7 +35,7 @@ fn compile_with_rasn() -> Result<(), Box<dyn Error>> {
     let out_file = out_path.join("rasn-generated.rs");
 
     for path in &asn_files {
-        println!("cargo:rerun-if-changed={path}");
+        println!("cargo::rerun-if-changed={path}");
     }
 
     eprintln!("rasn-compiler output to be written at {out_file:?}");
@@ -60,36 +60,58 @@ fn compile_with_rasn() -> Result<(), Box<dyn Error>> {
         Ok(warnings) => {
             /* handle compilation warnings */
             for w in warnings {
-                println!("cargo:warning=rasn-compiler issued {w:?}");
+                println!("cargo::warning=rasn-compiler issued {w:?}");
             }
             Ok(())
         }
         Err(error) => {
             /* handle unrecoverable compilation error */
-            panic!("rasn-compiler failed with: {error:?}")
+            let msg = format!("rasn-compiler failed with: {error:?}");
+            Err(msg.into())
         }
     }
 }
 
-fn main() {
-    if env::var("PROFILE").unwrap_or_default() != "debug" {
-        panic!(
-            "This project is NOT production-ready. Thus, \
-            the only compilation profile available is `debug`."
+fn check_profile(profile: &str) -> Result<(), Box<dyn Error>> {
+    if profile != "debug" {
+        // NOTE: no newlines for cargo::warning!
+        let warning = format!(
+            "This project is NOT production-ready. \
+            (Requested PROFILE={profile:?})."
         );
+        println!("cargo::warning={warning:}");
     }
 
+    Ok(())
+}
+
+fn try_main() -> Result<(), Box<dyn Error>> {
     // Always rerun if the variable FORCE_REBUILD changes
-    println!("cargo:rerun-if-env-changed=FORCE_REBUILD");
+    println!("cargo::rerun-if-env-changed=FORCE_REBUILD");
+
+    let profile = env::var("PROFILE").unwrap_or_default();
+    check_profile(&profile)?;
 
     let git_describe = get_git_describe().unwrap_or_else(|e| {
-        println!("cargo:warning=Failed to get git describe");
+        println!("cargo::warning=Failed to get git describe");
         eprintln!("Error was {e:?}");
         "FAILED_TO_GATHER_GIT_DESCRIBE".to_string()
     });
 
     #[cfg(feature = "_transcoders_deps")]
-    compile_with_rasn().expect("rasn-compiler failed");
+    compile_with_rasn().map_err(|e| {
+        eprintln!("{e:?}");
+        "rasn-compiler failed"
+    })?;
 
-    println!("cargo:rustc-env=CARGO_GIT_DESCRIBE={}", git_describe);
+    println!("cargo::rustc-env=CARGO_GIT_DESCRIBE={}", git_describe);
+
+    Ok(())
+}
+
+fn main() {
+    if let Err(err) = try_main() {
+        println!("cargo::error={err}");
+        std::process::exit(1);
+    }
 }

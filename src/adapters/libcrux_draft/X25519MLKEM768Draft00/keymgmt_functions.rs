@@ -70,14 +70,8 @@ pub struct KeyPair<'a> {
 impl<'a> Debug for KeyPair<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let private = match &self.private {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
             Some(_) => {
-                todo!("remove private key printing also from development builds");
                 format!("{}", "present")
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            Some(p) => {
-                format!("{:?}", p.encode())
             }
             None => format!("{:?}", None::<()>),
         };
@@ -205,19 +199,7 @@ impl KeyPair<'_> {
     pub fn encapsulate_ex(&self) -> Result<(EncapsulatedKey, SharedSecret), KMGMTError> {
         trace!(target: log_target!(), "Called ");
 
-        let mut rng = {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
-            {
-                let _prng = self.provctx.get_rng();
-                todo!("Retrieve rng from provctx");
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            {
-                // FIXME: clean this up and to the right thing above!
-                warn!(target: log_target!(), "{}", "Using OsRng!");
-                rand::rngs::OsRng
-            }
-        };
+        let mut rng = self.provctx.get_rng();
 
         self.encapsulate(&mut rng)
     }
@@ -250,19 +232,7 @@ impl<'a> KeyPair<'a> {
     #[named]
     fn generate(provctx: &'a ProviderInstance) -> Result<Self, KMGMTError> {
         trace!(target: log_target!(), "Called");
-        let mut rng = {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
-            {
-                let _prng = self.provctx.get_rng();
-                todo!("Retrieve rng from provctx");
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            {
-                // FIXME: clean this up and to the right thing above!
-                warn!(target: log_target!(), "{}", "Using OsRng!");
-                rand::rngs::OsRng
-            }
-        };
+        let mut rng = provctx.get_rng();
 
         // The libcrux_kem error type doesn't actually implement the std::error::Error trait,
         // so we have to match manually instead of using "?".
@@ -529,16 +499,8 @@ pub(super) unsafe extern "C" fn gen_set_params(
 ) -> c_int {
     trace!(target: log_target!(), "{}", "Called!");
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("set genctx params");
-    }
-
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "Ignoring params!");
-        return 1;
-    }
+    warn!(target: log_target!(), "{}", "Ignoring params!");
+    return 1;
 }
 
 #[named]
@@ -556,17 +518,9 @@ pub(super) unsafe extern "C" fn gen_settable_params(
         }
     };
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("return pointer to array of settable genctx params")
-    }
+    warn!(target: log_target!(), "{}", "TODO: return pointer to (non-empty) array of settable genctx params");
 
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "TODO: return pointer to (non-empty) array of settable genctx params");
-
-        crate::osslparams::EMPTY_PARAMS.as_ptr()
-    }
+    crate::osslparams::EMPTY_PARAMS.as_ptr()
 }
 
 #[named]

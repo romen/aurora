@@ -3,6 +3,7 @@ use aurora::bindings;
 use aurora::forge;
 use bindings::OSSL_ALGORITHM;
 use bindings::OSSL_PARAM;
+#[allow(unused_imports)]
 use forge::osslparams::OSSLParam;
 use forge::upcalls::{traits::*, CoreDispatchWithCoreHandle};
 use function_name::named;
@@ -120,9 +121,6 @@ impl<'a> AdaptersHandle<'a> {
         trace!(target: log_target!(), "{}", "Called!");
         self.check_state()?;
 
-        #[cfg(not(debug_assertions))] // code compiled only in release builds
-        todo!();
-
         trace!(target: log_target!(), "Registering algorithms for op {op_id:}: {algs:?}");
 
         match self.alg_iters.entry(op_id) {
@@ -155,14 +153,11 @@ impl<'a> AdaptersHandle<'a> {
         self.check_state()?;
 
         trace!(target: log_target!(), "Registering capability {capability:?}:");
-        #[cfg(debug_assertions)] // code compiled only in debug builds
-        {
-            let params = OSSLParam::try_from(params_list).map_err(|e| {
-                anyhow! {e}
-            })?;
-            for p in params {
-                trace!(target: log_target!(), "  {p:?}\n");
-            }
+        let params = OSSLParam::try_from(params_list).map_err(|e| {
+            anyhow! {e}
+        })?;
+        for p in params {
+            trace!(target: log_target!(), "  {p:?}\n");
         }
 
         match self.capabilities.entry(&capability) {

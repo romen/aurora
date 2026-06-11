@@ -250,14 +250,8 @@ pub struct KeyPair<'a> {
 impl<'a> Debug for KeyPair<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let private = match &self.private {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
             Some(_) => {
-                todo!("remove private key printing also from development builds");
-                format!("{}", "present")
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            Some(p) => {
-                format!("{:02x?}", p.encode())
+                format!("present")
             }
             None => format!("{:?}", None::<()>),
         };
@@ -301,19 +295,7 @@ impl<'a> KeyPair<'a> {
     fn generate(provctx: &'a ProviderInstance) -> Result<Self, KMGMTError> {
         trace!(target: log_target!(), "Called");
 
-        let mut rng = {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
-            {
-                let _prng = self.provctx.get_rng();
-                todo!("Retrieve rng from provctx");
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            {
-                // FIXME: clean this up and to the right thing above!
-                warn!(target: log_target!(), "{}", "Using OsRng!");
-                rand::rngs::OsRng
-            }
-        };
+        let mut rng = provctx.get_rng();
 
         let sk = InnerPrivKey::new(&mut rng);
         let pk = sk.verifying_key();
@@ -712,18 +694,10 @@ pub(super) unsafe extern "C" fn gen_set_params(
     _vgenctx: *mut c_void,
     _params: *const OSSL_PARAM,
 ) -> c_int {
-    trace!(target: log_target!(), "{}", "Called!");
+    trace!(target: log_target!(), "Called!");
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("set genctx params");
-    }
-
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "Ignoring params!");
-        return 1;
-    }
+    warn!(target: log_target!(), "Ignoring params!");
+    return 1;
 }
 
 #[named]
@@ -741,17 +715,9 @@ pub(super) unsafe extern "C" fn gen_settable_params(
         }
     };
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("return pointer to array of settable genctx params")
-    }
+    warn!(target: log_target!(), "TODO: return pointer to (non-empty) array of settable genctx params");
 
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "TODO: return pointer to (non-empty) array of settable genctx params");
-
-        crate::osslparams::EMPTY_PARAMS.as_ptr()
-    }
+    crate::osslparams::EMPTY_PARAMS.as_ptr()
 }
 
 #[named]

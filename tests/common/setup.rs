@@ -64,10 +64,8 @@ mod build {
             match profile {
                 "debug" => (),
                 "release" => {
-                    log::error!("{profile:?} is intentionally not supported at the moment");
-                    unimplemented!();
-                    //let flag = format!("--{profile:}");
-                    //cmd.arg(flag);
+                    let flag = format!("--{profile:}");
+                    cmd.arg(flag);
                 }
                 _ => {
                     log::error!("Unknown profile: {profile:?}");

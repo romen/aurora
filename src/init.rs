@@ -17,7 +17,8 @@ pub use env_logger as logger;
 
 #[cfg(feature = "env_logger")]
 fn inner_try_init_logging() -> Result<(), OurError> {
-    logger::Builder::from_default_env()
+    let env = logger::Env::default().default_filter_or("error,aurora::init=warn");
+    logger::Builder::from_env(env)
         //.filter_level(log::LevelFilter::Debug)
         .format_timestamp(None) // Optional: disable timestamps
         .format_module_path(false) // Optional: disable module path
@@ -51,8 +52,23 @@ pub extern "C" fn OSSL_provider_init(
     const RET_SUCCESS: c_int = 1;
     const RET_FAILURE: c_int = 0;
 
-    #[cfg(feature = "env_logger")]
     try_init_logging().expect("Failed initializing logger subsystem");
+
+    #[cfg(not(debug_assertions))]
+    {
+        // Emit a warning in `release` builds
+        let prod_warning = format!(
+            "{} (v{}) is currently in development and not yet ready for production use.",
+            PROV_NAME, PROV_VER
+        );
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "env_logger")] {
+                warn!(target: log_target!(), "{}", prod_warning);
+            } else {
+                eprintln!("WARNING: {prod_warning:}");
+            }
+        }
+    }
 
     trace!(target: log_target!(), "Just called a 🦀 Rust function from C!");
     trace!(target: log_target!(), "This is 🌌 {} v{}", PROV_NAME, PROV_VER);

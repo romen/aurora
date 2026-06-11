@@ -249,14 +249,8 @@ pub struct KeyPair<'a> {
 impl<'a> Debug for KeyPair<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let private = match &self.private {
-            #[cfg(not(debug_assertions))] // code compiled only in release builds
             Some(_) => {
-                todo!("remove private key printing also from development builds");
                 format!("{}", "present")
-            }
-            #[cfg(debug_assertions)] // code compiled only in development builds
-            Some(p) => {
-                format!("{:02x?}", p.encode())
             }
             None => format!("{:?}", None::<()>),
         };
@@ -699,16 +693,8 @@ pub(super) unsafe extern "C" fn gen_set_params(
 ) -> c_int {
     trace!(target: log_target!(), "{}", "Called!");
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("set genctx params");
-    }
-
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "Ignoring params!");
-        return 1;
-    }
+    warn!(target: log_target!(), "{}", "Ignoring params!");
+    return 1;
 }
 
 #[named]
@@ -726,17 +712,9 @@ pub(super) unsafe extern "C" fn gen_settable_params(
         }
     };
 
-    #[cfg(not(debug_assertions))] // code compiled only in release builds
-    {
-        todo!("return pointer to array of settable genctx params")
-    }
+    warn!(target: log_target!(), "{}", "TODO: return pointer to (non-empty) array of settable genctx params");
 
-    #[cfg(debug_assertions)] // code compiled only in development builds
-    {
-        warn!(target: log_target!(), "{}", "TODO: return pointer to (non-empty) array of settable genctx params");
-
-        crate::osslparams::EMPTY_PARAMS.as_ptr()
-    }
+    crate::osslparams::EMPTY_PARAMS.as_ptr()
 }
 
 #[named]
