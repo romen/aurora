@@ -1322,6 +1322,8 @@ dependencies = [
  "kem",
  "lazy_static",
  "libc",
+ "libcrux-ecdh",
+ "libcrux-hacl",
  "libcrux-kem",
  "log",
  "ml-dsa",
