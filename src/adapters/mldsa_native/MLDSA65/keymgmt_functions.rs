@@ -1,4 +1,5 @@
 use super::*;
+use crate::random::prelude::*;
 use bindings::{
     OSSL_CALLBACK, OSSL_KEYMGMT_SELECT_KEYPAIR, OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
     OSSL_KEYMGMT_SELECT_PUBLIC_KEY, OSSL_PKEY_PARAM_BITS, OSSL_PKEY_PARAM_MANDATORY_DIGEST,
@@ -402,8 +403,11 @@ impl<'a> KeyPair<'a> {
         trace!(target: log_target!(), "Called");
 
         let mut seed = [0u8; 32];
-        let rng = provctx.get_rng();
-        rng.fill_bytes(&mut seed);
+        let mut rng = provctx.get_rng();
+        rng.try_fill_bytes(&mut seed).map_err(|e| {
+            log::error!("Failed to retrieve randomness: {e:?}");
+            KMGMTError::from(e)
+        })?;
 
         let seed: &MlDsaSeed = &seed.into();
         let (sk, pk) = backend_module::keygen_from_seed(seed)?;

@@ -20,10 +20,12 @@ const PROPERTY_DEFINITION: &CStr =
 
 #[allow(non_snake_case)]
 pub(crate) mod MLDSA44;
+#[cfg(feature = "_composite_mldsa_eddsa")]
 #[allow(non_snake_case)]
 pub(crate) mod MLDSA44_Ed25519;
 #[allow(non_snake_case)]
 pub(crate) mod MLDSA65;
+#[cfg(feature = "_composite_mldsa_eddsa")]
 #[allow(non_snake_case)]
 pub(crate) mod MLDSA65_Ed25519;
 #[allow(non_snake_case)]
@@ -41,7 +43,9 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             algorithm_to_register!(MLDSA44, SIG_FUNCTIONS),
             algorithm_to_register!(MLDSA65, SIG_FUNCTIONS),
             algorithm_to_register!(MLDSA87, SIG_FUNCTIONS),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             algorithm_to_register!(MLDSA65_Ed25519, SIG_FUNCTIONS),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             algorithm_to_register!(MLDSA44_Ed25519, SIG_FUNCTIONS),
         ]);
         // ownership transfers to the iterator which is transferred to the handle
@@ -51,7 +55,9 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             algorithm_to_register!(MLDSA44, KMGMT_FUNCTIONS),
             algorithm_to_register!(MLDSA65, KMGMT_FUNCTIONS),
             algorithm_to_register!(MLDSA87, KMGMT_FUNCTIONS),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             algorithm_to_register!(MLDSA65_Ed25519, KMGMT_FUNCTIONS),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             algorithm_to_register!(MLDSA44_Ed25519, KMGMT_FUNCTIONS),
         ]);
         // ownership transfers to the iterator which is transferred to the handle
@@ -69,10 +75,14 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             decoder_to_register!(MLDSA87, DECODER_DER2SubjectPublicKeyInfo),
             decoder_to_register!(MLDSA87, DECODER_DER2PrivateKeyInfo),
             // MLDSA65_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             decoder_to_register!(MLDSA65_Ed25519, DECODER_DER2SubjectPublicKeyInfo),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             decoder_to_register!(MLDSA65_Ed25519, DECODER_DER2PrivateKeyInfo),
             // MLDSA44_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             decoder_to_register!(MLDSA44_Ed25519, DECODER_DER2SubjectPublicKeyInfo),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             decoder_to_register!(MLDSA44_Ed25519, DECODER_DER2PrivateKeyInfo),
         ]);
 
@@ -101,18 +111,30 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             encoder_to_register!(MLDSA87, ENCODER_SubjectPublicKeyInfo2PEM),
             encoder_to_register!(MLDSA87, ENCODER_PubKeyStructureless2Text),
             // MLDSA65_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_PrivateKeyInfo2DER),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_PrivateKeyInfo2PEM),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_PrivateKeyInfo2Text),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_SubjectPublicKeyInfo2DER),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_SubjectPublicKeyInfo2PEM),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA65_Ed25519, ENCODER_PubKeyStructureless2Text),
             // MLDSA44_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_PrivateKeyInfo2DER),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_PrivateKeyInfo2PEM),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_PrivateKeyInfo2Text),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_SubjectPublicKeyInfo2DER),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_SubjectPublicKeyInfo2PEM),
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             encoder_to_register!(MLDSA44_Ed25519, ENCODER_PubKeyStructureless2Text),
         ]);
 
@@ -142,8 +164,10 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             // Add second sigalg capability for better compatibility with OQS-provider
             MLDSA87::capabilities::tls_sigalg::OSSL_PARAM_ARRAY_OQSCOMP,
             // ------ MLDSA65_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             MLDSA65_Ed25519::capabilities::tls_sigalg::OSSL_PARAM_ARRAY,
             // ------ MLDSA44_Ed25519
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             MLDSA44_Ed25519::capabilities::tls_sigalg::OSSL_PARAM_ARRAY,
         ];
         for a in tls_sigalgs {
@@ -162,7 +186,9 @@ impl AdapterContextTrait for MldsaNativeAdapter {
             MLDSA44::OBJ_SIGID,
             MLDSA65::OBJ_SIGID,
             MLDSA87::OBJ_SIGID,
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             MLDSA65_Ed25519::OBJ_SIGID,
+            #[cfg(feature = "_composite_mldsa_eddsa")]
             MLDSA44_Ed25519::OBJ_SIGID,
         ];
 

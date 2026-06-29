@@ -1,6 +1,7 @@
 #![allow(unreachable_code)]
 
 use super::*;
+use crate::random::prelude::*;
 use bindings::{
     OSSL_CALLBACK, OSSL_KEYMGMT_SELECT_KEYPAIR, OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
     OSSL_KEYMGMT_SELECT_PUBLIC_KEY, OSSL_PKEY_PARAM_BITS, OSSL_PKEY_PARAM_MANDATORY_DIGEST,
@@ -553,12 +554,13 @@ impl<'a> KeyPair<'a> {
         trace!(target: log_target!(), "Called");
 
         // generate PQ private key
-        let prng = provctx.get_rng();
+        let mut rng = provctx.get_rng();
         let mut seed_buf = [0u8; PQPrivateKey::seed_bytes()];
-        let pq_private_key = match prng.try_fill_bytes(&mut seed_buf) {
-            Ok(_) => PQPrivateKey::new(&seed_buf)?,
-            Err(_) => anyhow::bail!("Unable to generate randomness for ML-DSA keygen"),
-        };
+        rng.try_fill_bytes(&mut seed_buf).map_err(|e| {
+            log::error!("Failed to retrieve randomness: {e:?}");
+            KMGMTError::from(e)
+        })?;
+        let pq_private_key = PQPrivateKey::new(&seed_buf)?;
 
         // derive PQ public key from it
         let pq_public_key = pq_private_key.derive_public_key().ok_or(anyhow!(
@@ -566,7 +568,7 @@ impl<'a> KeyPair<'a> {
         ))?;
 
         // generate traditional keypair
-        let trad_keypair = trad_backend_module::SigningKey::generate(provctx.get_rng());
+        let trad_keypair = trad_backend_module::SigningKey::generate(&mut rng);
         let trad_private_key = trad_keypair.to_bytes();
         let trad_public_key = trad_keypair.verifying_key();
 
