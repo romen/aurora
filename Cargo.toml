@@ -43,7 +43,6 @@ _mlkem_hybrids = []
 _composite_mldsa_eddsa = []
 
 libcrux_adapter = ["dep:libcrux-kem", "dep:kem", "_mlkem_hybrids"]
-libcrux_draft_adapter = ["dep:libcrux-kem", "dep:kem", "_mlkem_hybrids"]
 pqclean_adapter = [
   "dep:pqcrypto-mldsa",
   "dep:pqcrypto-traits",

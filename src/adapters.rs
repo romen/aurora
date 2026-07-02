@@ -16,8 +16,6 @@ use anyhow::anyhow;
 
 #[cfg(feature = "libcrux_adapter")]
 mod libcrux;
-#[cfg(feature = "libcrux_draft_adapter")]
-mod libcrux_draft;
 #[cfg(feature = "mldsa_native_adapter")]
 mod mldsa_native;
 #[cfg(feature = "pqclean_adapter")]
@@ -277,8 +275,6 @@ impl<'a> FinalizedAdaptersHandle {
         // initialize and register each adapter
         #[cfg(feature = "libcrux_adapter")]
         libcrux::init(&mut handle).expect("Failure initializing adapter `libcrux`");
-        #[cfg(feature = "libcrux_draft_adapter")]
-        libcrux_draft::init(&mut handle).expect("Failure initializing adapter `libcrux_draft`");
         #[cfg(feature = "mldsa_native_adapter")]
         mldsa_native::init(&mut handle).expect("Failure initializing adapter `mldsa_native`");
         #[cfg(feature = "pqclean_adapter")]
