@@ -21,7 +21,7 @@ default = [
   "_composite_sigs_draft_13",
 ]
 default_adapters = [
-  #"libcrux_adapter",
+  "libcrux_adapter",
   #"rustcrypto_adapter",
   #"slhdsa_c_adapter",
   #"mldsa_native_adapter",
@@ -90,9 +90,7 @@ pkcs8 = { version = "0.10.2", features = ["alloc"], optional = true }
 ed25519-dalek = { version = "2.1.1", features = ["rand_core"], optional = true }
 ml-dsa = { version = "=0.1.0-rc.0", optional = true }
 slh-dsa = { version = "0.0.3", optional = true }
-libcrux-kem = { version = "=0.0.2-alpha.3", optional = true }
-libcrux-ecdh = { version = "=0.0.2-alpha.3", optional = true }
-libcrux-hacl = { version = "=0.0.2-alpha.3", optional = true }
+libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
 slhdsa-c-rs = { version = "0.0.3", optional = true }
 pqcrypto-mldsa = { version = "0.1.2", optional = true }
 pqcrypto-traits = { version = "0.3.5", optional = true }

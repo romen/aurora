@@ -1,13 +1,13 @@
 use super::OurError as KMGMTError;
 use super::*;
+use crate::random::prelude::*;
+use crate::traits::kem::{Decapsulate, Encapsulate};
 use bindings::{
     CONST_OSSL_PARAM, OSSL_CALLBACK, OSSL_PARAM, OSSL_PARAM_OCTET_STRING,
     OSSL_PKEY_PARAM_ENCODED_PUBLIC_KEY, OSSL_PKEY_PARAM_PRIV_KEY, OSSL_PKEY_PARAM_PUB_KEY,
 };
 use forge::{keymgmt::selection::Selection, osslparams};
-use kem::{Decapsulate, Encapsulate};
 use osslparams::OSSLParam;
-use rand_core::CryptoRngCore;
 use std::{
     ffi::{c_int, c_void},
     fmt::Debug,
@@ -69,7 +69,7 @@ impl Encapsulate<EncapsulatedKey, SharedSecret> for PublicKey {
     #[named]
     fn encapsulate(
         &self,
-        rng: &mut impl CryptoRngCore,
+        rng: &mut impl CryptoRng,
     ) -> Result<(EncapsulatedKey, SharedSecret), Self::Error> {
         trace!(target: log_target!(), "Called ");
 
@@ -239,7 +239,7 @@ impl Encapsulate<EncapsulatedKey, SharedSecret> for KeyPair<'_> {
     #[named]
     fn encapsulate(
         &self,
-        rng: &mut impl CryptoRngCore,
+        rng: &mut impl CryptoRng,
     ) -> Result<(EncapsulatedKey, SharedSecret), Self::Error> {
         trace!(target: log_target!(), "Called ");
         match &self.public {
