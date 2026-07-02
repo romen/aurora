@@ -828,16 +828,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kem"
-version = "0.3.0-pre.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b8645470337db67b01a7f966decf7d0bafedbae74147d33e641c67a91df239f"
-dependencies = [
- "rand_core 0.6.4",
- "zeroize",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1263,7 +1253,6 @@ dependencies = [
  "env_logger",
  "function_name",
  "itertools 0.14.0",
- "kem",
  "lazy_static",
  "libc",
  "libcrux-ecdh",

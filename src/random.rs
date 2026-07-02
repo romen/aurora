@@ -1,5 +1,5 @@
 use super::{named, ProviderInstance};
-use rand::rand_core::CryptoRng;
+pub use rand::rand_core::CryptoRng;
 
 // we re-export `rand` so consumers can bring into scope the needed traits from the appropriate
 // `rand` crate version
@@ -9,7 +9,9 @@ pub(crate) use ::rand;
 // discovering which traits from `rand` they need.
 pub mod prelude {
     #![allow(unused_imports)]
+
     pub(crate) use super::rand::TryRng;
+    pub(crate) use super::CryptoRng;
 }
 
 impl<'a> ProviderInstance<'a> {
