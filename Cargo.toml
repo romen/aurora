@@ -24,7 +24,7 @@ default_adapters = [
   "libcrux_adapter",
   #"rustcrypto_adapter",
   #"slhdsa_c_adapter",
-  #"mldsa_native_adapter",
+  "mldsa_native_adapter",
 ]
 env_logger = ["dep:env_logger"]
 skip_troublesome_wycheproof = []
@@ -94,11 +94,12 @@ libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
 slhdsa-c-rs = { version = "0.0.3", optional = true }
 pqcrypto-mldsa = { version = "0.1.2", optional = true }
 pqcrypto-traits = { version = "0.3.5", optional = true }
-mldsa-native-rs = { version = "0.0.1-alpha.4", optional = true }
+mldsa-native-rs = { version = "=0.0.1-alpha.5", optional = true }
 sha2 = { version = "0.10.9", optional = true }
 itertools = "0.14.0"
 constcat = "0.6.1"
 cfg-if = "1.0.4"
+signature = { version = "3.0.0", features = ["alloc"] }
 
 [build-dependencies]
 rasn-compiler = "0.11.0"

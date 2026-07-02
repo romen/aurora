@@ -366,9 +366,9 @@ pub(super) use encoder_functions::SubjectPublicKeyInfo2PEM as ENCODER_SubjectPub
 
 #[cfg(test)]
 mod tests {
+    use super::signature::{Verifier, VerifierWithCtx};
     use super::*;
     use crate::adapters::common::wycheproof::*;
-    use signature::{Verifier, VerifierWithCtx};
     use wycheproof::composite_mldsa_verify;
 
     #[allow(non_camel_case_types)]
@@ -388,7 +388,7 @@ mod tests {
         );
     }
 
-    use signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
+    use super::signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
     use wycheproof::composite_mldsa_sign;
 
     impl_sigalg_sign_variant!(

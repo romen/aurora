@@ -26,7 +26,7 @@
 //! occurs. Ensure that a logger is properly configured in your application to capture these logs.
 
 use super::*;
-pub use forge::crypto::signature::{Error, SignatureEncoding, Signer, Verifier};
+pub use crate::traits::signature::{Error, SignatureEncoding, Signer, Verifier};
 
 /// The main type representing a digital signature. It implements the `TryFrom`
 /// trait for conversion from a byte slice (`&[u8]`) and ensures that the input length matches

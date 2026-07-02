@@ -407,9 +407,9 @@ pub(super) use signature::{Signature, SignerWithCtx, VerifierWithCtx};
 
 #[cfg(test)]
 mod tests {
+    use super::signature::{Verifier, VerifierWithCtx};
     use super::*;
     use crate::adapters::common::wycheproof::*;
-    use signature::{Verifier, VerifierWithCtx};
     use wycheproof::mldsa_verify;
 
     struct Mldsa44;
@@ -422,7 +422,7 @@ mod tests {
         run_mldsa_wycheproof_verify_tests::<Mldsa44>(mldsa_verify::TestName::MlDsa44Verify);
     }
 
-    use signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
+    use super::signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
     use wycheproof::mldsa_sign;
 
     impl_sigalg_sign_variant!(Mldsa44, keymgmt_functions::PrivateKey, signature::Signature);

@@ -7,8 +7,8 @@ use super::keymgmt_functions::KeyPair;
 use super::signature::*;
 use super::OurError as SignatureError;
 use super::*;
+use crate::traits::signature::VerificationError;
 use bindings::{OSSL_PARAM, OSSL_SIGNATURE_PARAM_ALGORITHM_ID};
-use forge::operations::signature::VerificationError;
 use forge::osslparams::OSSLParam;
 use libc::{c_char, c_int, c_uchar, c_void};
 

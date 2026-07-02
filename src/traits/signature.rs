@@ -1,12 +1,44 @@
+#![allow(dead_code)]
+
+use std::error::Error as ErrorTrait;
 use std::fmt::Debug;
 
-#[derive(Debug)]
-pub struct Error();
+pub use ::signature::{Error, SignatureEncoding, Signer, Verifier};
 
-impl core::fmt::Display for Error {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "signature error")
+#[derive(Debug)]
+pub enum VerificationError {
+    InvalidSignature,
+    GenericVerificationError,
+}
+
+impl core::fmt::Display for VerificationError {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
+        match self {
+            VerificationError::InvalidSignature => write!(f, "error: verification failed"),
+            VerificationError::GenericVerificationError => {
+                write!(f, "error: generic internal failure")
+            }
+        }
     }
 }
 
-impl core::error::Error for Error {}
+impl ErrorTrait for VerificationError {}
+
+impl From<Error> for VerificationError {
+    fn from(value: Error) -> Self {
+        value
+            .source()
+            .map_or(VerificationError::GenericVerificationError, |e| {
+                if let Some(ver_err) = e.downcast_ref::<VerificationError>() {
+                    match ver_err {
+                        VerificationError::InvalidSignature => VerificationError::InvalidSignature,
+                        VerificationError::GenericVerificationError => {
+                            VerificationError::GenericVerificationError
+                        }
+                    }
+                } else {
+                    VerificationError::GenericVerificationError
+                }
+            })
+    }
+}
