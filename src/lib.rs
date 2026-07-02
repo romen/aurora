@@ -11,6 +11,7 @@ pub(crate) use helpers::{concat_cstr, handleResult, log_target, named, str_to_cs
 
 pub(crate) mod adapters;
 pub(crate) mod forge;
+pub(crate) mod traits;
 
 mod init;
 mod query;
@@ -232,8 +233,4 @@ impl CoreUpcallerWithCoreHandle for ProviderInstance<'_> {
     fn get_core_handle(&self) -> *const OSSL_CORE_HANDLE {
         self.core_handle
     }
-}
-
-pub mod traits {
-    pub use super::upcalls::traits::{CoreUpcaller, CoreUpcallerWithCoreHandle};
 }

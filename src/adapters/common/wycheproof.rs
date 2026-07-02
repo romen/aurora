@@ -1,4 +1,4 @@
-use crate::forge::crypto::signature;
+use crate::traits::signature;
 use wycheproof::{
     composite_mldsa_sign, composite_mldsa_verify, mldsa_sign, mldsa_verify, TestResult,
 };
