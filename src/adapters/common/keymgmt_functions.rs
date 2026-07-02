@@ -51,6 +51,7 @@ pub(crate) unsafe extern "C" fn export_types_forbidden(selection: c_int) -> *con
     return ret;
 }
 
+#[allow(unused_macros)]
 macro_rules! oid_consistency_tests {
     () => {
         #[cfg(test)]
@@ -70,6 +71,7 @@ macro_rules! oid_consistency_tests {
         }
     };
 }
+#[allow(unused_imports)]
 pub(crate) use oid_consistency_tests;
 
 #[cfg(test)]

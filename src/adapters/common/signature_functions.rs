@@ -1,3 +1,6 @@
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+
 use std::error::Error;
 
 use super::keymgmt_functions::KeyPair;

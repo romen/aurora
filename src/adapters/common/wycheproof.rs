@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![allow(dead_code)]
+
 use crate::traits::signature;
 use wycheproof::{
     composite_mldsa_sign, composite_mldsa_verify, mldsa_sign, mldsa_verify, TestResult,

@@ -270,6 +270,8 @@ mod test_structs {
         const ALG_NAME: &str = "id-slh-dsa-shake-256s";
     }
 }
+
+#[allow(unused_imports)]
 use test_structs::*;
 
 #[allow(unused_macros)]

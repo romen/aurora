@@ -1,3 +1,6 @@
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+
 /// Make a text encoder for a public key.
 ///
 /// The encoder outputs the bytes of the key as colon-separated hex values.

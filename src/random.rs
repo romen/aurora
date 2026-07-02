@@ -8,6 +8,7 @@ pub(crate) use ::rand;
 // This module is for convenience, so consumers can just `use crate::random::prelude::*` instead of
 // discovering which traits from `rand` they need.
 pub mod prelude {
+    #![allow(unused_imports)]
     pub(crate) use super::rand::TryRng;
 }
 
