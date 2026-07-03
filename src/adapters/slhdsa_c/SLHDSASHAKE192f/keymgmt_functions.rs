@@ -1,18 +1,15 @@
 use super::*;
+use crate::traits::signature as signature_traits;
 use bindings::{
     OSSL_CALLBACK, OSSL_KEYMGMT_SELECT_KEYPAIR, OSSL_KEYMGMT_SELECT_PRIVATE_KEY,
     OSSL_KEYMGMT_SELECT_PUBLIC_KEY, OSSL_PKEY_PARAM_BITS, OSSL_PKEY_PARAM_MANDATORY_DIGEST,
     OSSL_PKEY_PARAM_MAX_SIZE, OSSL_PKEY_PARAM_PRIV_KEY, OSSL_PKEY_PARAM_PUB_KEY,
     OSSL_PKEY_PARAM_SECURITY_BITS,
 };
-use forge::crypto::cipher::Unsigned; // needed for slh-dsa crate to fetch the expected sizes as USIZE
 use forge::{
-    bindings,
-    operations::keymgmt::selection::Selection,
-    operations::signature::{Signer, VerificationError, Verifier},
-    ossl_callback::OSSLCallback,
-    osslparams::*,
+    bindings, operations::keymgmt::selection::Selection, ossl_callback::OSSLCallback, osslparams::*,
 };
+use signature_traits::{Signer, VerificationError, Verifier};
 
 use std::{
     ffi::{c_int, c_void},
@@ -20,6 +17,7 @@ use std::{
 };
 
 use backend_module::transcoding::*;
+use backend_module::Unsigned; // needed to fetch the expected sizes as USIZE
 use backend_module::{Keypair, KeypairRef, ParameterSet};
 use slhdsa_c_rs as backend_module;
 type InnerParamSet = backend_module::SLH_DSA_SHAKE_192f;
@@ -113,20 +111,18 @@ impl PublicKey {
 
 impl Verifier<Signature> for PublicKey {
     #[named]
-    fn verify(&self, msg: &[u8], sig: &Signature) -> Result<(), forge::crypto::signature::Error> {
+    fn verify(&self, msg: &[u8], sig: &Signature) -> Result<(), signature_traits::Error> {
         let Self(ref pk) = self;
         let sig = sig.to_bytes();
         let sig: &[u8] = sig.as_ref();
         let signature: &InnerSig = &InnerSig::try_from(sig).map_err(|e| {
             error!(target: log_target!(), "{e:?}");
-            forge::crypto::signature::Error::from_source(
-                VerificationError::GenericVerificationError,
-            )
+            signature_traits::Error::from_source(VerificationError::GenericVerificationError)
         })?;
 
         pk.verify(msg, signature).map_err(|e| {
             error!(target: log_target!(), "{e:?}");
-            forge::crypto::signature::Error::from_source(e)
+            signature_traits::Error::from_source(e)
         })
     }
 }
@@ -143,7 +139,7 @@ impl PrivateKey {
     pub fn decode(bytes: &[u8]) -> Result<Self, KMGMTError> {
         let sk = InnerPrivKey::try_from(bytes).map_err(|e| {
             error!(target: log_target!(), "{e:?}");
-            forge::crypto::signature::Error::from_source(e)
+            signature_traits::Error::from_source(e)
         })?;
         Ok(Self(sk))
     }
@@ -225,16 +221,16 @@ impl PrivateKey {
 
 impl Signer<Signature> for PrivateKey {
     #[named]
-    fn try_sign(&self, msg: &[u8]) -> Result<Signature, forge::crypto::signature::Error> {
+    fn try_sign(&self, msg: &[u8]) -> Result<Signature, signature_traits::Error> {
         let Self(ref sk) = self;
         let signature = sk.try_sign(msg).map_err(|e| {
             error!(target: log_target!(), "{e:?}");
-            forge::crypto::signature::Error::from_source(e)
+            signature_traits::Error::from_source(e)
         })?;
         let signature = signature.to_vec();
         Signature::try_from(signature.as_slice()).map_err(|e| {
             error!(target: log_target!(), "{e:?}");
-            forge::crypto::signature::Error::from_source(e)
+            signature_traits::Error::from_source(e)
         })
     }
 }
@@ -321,7 +317,7 @@ impl<'a> KeyPair<'a> {
 
 impl<'a> Signer<Signature> for KeyPair<'a> {
     #[named]
-    fn try_sign(&self, msg: &[u8]) -> Result<Signature, forge::crypto::signature::Error> {
+    fn try_sign(&self, msg: &[u8]) -> Result<Signature, signature_traits::Error> {
         trace!(target: log_target!(), "Called");
 
         let sk = self
@@ -332,14 +328,14 @@ impl<'a> Signer<Signature> for KeyPair<'a> {
                     "This keypair does not have a private key, so it cannot generate signatures"
                 )
             })
-            .map_err(forge::crypto::signature::Error::from_source)?;
+            .map_err(signature_traits::Error::from_source)?;
         Ok(sk.try_sign(msg)?)
     }
 }
 
 impl<'a> Verifier<Signature> for KeyPair<'a> {
     #[named]
-    fn verify(&self, msg: &[u8], sig: &Signature) -> Result<(), forge::crypto::signature::Error> {
+    fn verify(&self, msg: &[u8], sig: &Signature) -> Result<(), signature_traits::Error> {
         trace!(target: log_target!(), "Called");
 
         let pk = self
@@ -350,9 +346,7 @@ impl<'a> Verifier<Signature> for KeyPair<'a> {
             })
             .map_err(|e| {
                 error!("{e:#}");
-                forge::crypto::signature::Error::from_source(
-                    VerificationError::GenericVerificationError,
-                )
+                signature_traits::Error::from_source(VerificationError::GenericVerificationError)
             })?;
         pk.verify(msg, sig)
     }

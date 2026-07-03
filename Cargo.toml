@@ -23,7 +23,7 @@ default = [
 default_adapters = [
   "libcrux_adapter",
   #"rustcrypto_adapter",
-  #"slhdsa_c_adapter",
+  "slhdsa_c_adapter",
   "mldsa_native_adapter",
 ]
 env_logger = ["dep:env_logger"]
@@ -91,7 +91,7 @@ ed25519-dalek = { version = "3.0.0", features = ["rand_core"], optional = true }
 ml-dsa = { version = "=0.1.0-rc.0", optional = true }
 slh-dsa = { version = "0.0.3", optional = true }
 libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
-slhdsa-c-rs = { version = "0.0.3", optional = true }
+slhdsa-c-rs = { version = "0.0.5", optional = true }
 pqcrypto-mldsa = { version = "0.1.2", optional = true }
 pqcrypto-traits = { version = "0.3.5", optional = true }
 mldsa-native-rs = { version = "=0.0.1-alpha.5", optional = true }
