@@ -82,7 +82,7 @@ openssl_provider_forge = "0.10"
 env_logger = { version = "0.11.11", optional = true }
 anyhow = "1.0"
 lazy_static = "1.5.0"
-asn1 = "0.23"
+asn1 = "0.24"
 rand = "0.10"
 rasn = { version = "=0.27.0", optional = true } # pinned: 0.27.1+ requires rustc >= 1.87.0
 der = { version = "0.8", optional = true }

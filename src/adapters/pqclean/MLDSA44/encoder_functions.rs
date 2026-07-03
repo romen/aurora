@@ -101,7 +101,7 @@ pub(super) unsafe extern "C" fn freectx(vencoderctx: *mut c_void) {
 
 fn private_key_bytes_to_DER(keypair_bytes: Vec<u8>) -> Result<Vec<u8>, asn1::WriteError> {
     asn1::write(|w| {
-        w.write_element(&asn1::SequenceWriter::new(&|w| {
+        w.write_element(&asn1::SequenceWriter::new(&|w| -> asn1::WriteResult {
             // version (when reading this we discard it)
             w.write_element(&asn1::BigInt::new(&[0]))?;
             // algorithm identifier

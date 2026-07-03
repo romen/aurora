@@ -87,7 +87,7 @@ crate::adapters::common::keymgmt_functions::oid_consistency_tests!();
 use std::sync::LazyLock;
 pub(crate) static ALGORITHM_ID_DER: LazyLock<Vec<u8>> = LazyLock::new(|| {
     asn1::write(|w| {
-        w.write_element(&asn1::SequenceWriter::new(&|w| {
+        w.write_element(&asn1::SequenceWriter::new(&|w| -> asn1::WriteResult {
             w.write_element(&OID)?;
             Ok(())
         }))
