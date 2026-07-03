@@ -402,9 +402,9 @@ pub(super) use encoder_functions::SubjectPublicKeyInfo2PEM as ENCODER_SubjectPub
 
 #[cfg(test)]
 mod tests {
+    use super::signature::{Verifier, VerifierWithCtx};
     use super::*;
     use crate::adapters::common::wycheproof::*;
-    use signature::{Verifier, VerifierWithCtx};
     use wycheproof::mldsa_verify;
 
     struct Mldsa87;
@@ -417,7 +417,7 @@ mod tests {
         run_mldsa_wycheproof_verify_tests::<Mldsa87>(mldsa_verify::TestName::MlDsa87Verify);
     }
 
-    use signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
+    use super::signature::{SignatureBytes, SignatureEncoding, Signer, SignerWithCtx};
     use wycheproof::mldsa_sign;
 
     impl_sigalg_sign_variant!(Mldsa87, keymgmt_functions::PrivateKey, signature::Signature);
