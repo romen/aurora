@@ -23,6 +23,7 @@ fn get_git_describe() -> Result<String, Box<dyn Error>> {
 #[cfg(feature = "_transcoders_deps")]
 fn compile_with_rasn() -> Result<(), Box<dyn Error>> {
     use rasn_compiler::prelude::*;
+    use rasn_compiler::OutputMode;
     use std::env;
     use std::path::PathBuf;
 
@@ -47,7 +48,7 @@ fn compile_with_rasn() -> Result<(), Box<dyn Error>> {
         // add several ASN1 source files
         .add_asn_sources_by_path(asn_files.iter())
         // set an output path for the generated rust code
-        .set_output_path(out_file)
+        .set_output_mode(OutputMode::SingleFile(out_file))
         // you may also compile literal ASN1 snippets
         //.add_asn_literal(
         //    format!(

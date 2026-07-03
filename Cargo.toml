@@ -104,7 +104,7 @@ signature = { version = "3.0.0", features = ["alloc"] }
 typenum = { version = "1.20.1", optional = true }
 
 [build-dependencies]
-rasn-compiler = "0.11.0"
+rasn-compiler = "0.16"
 
 [dev-dependencies]
 regex = "1"
