@@ -1334,7 +1334,7 @@ dependencies = [
  "asn1",
  "cfg-if",
  "constcat",
- "der 0.7.10",
+ "der 0.8.0",
  "ed25519-dalek",
  "env_logger",
  "function_name",
