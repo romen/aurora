@@ -3,7 +3,7 @@
 use std::error::Error as ErrorTrait;
 use std::fmt::Debug;
 
-pub use ::signature::{Error, SignatureEncoding, Signer, Verifier};
+pub use ::signature::{Error, Keypair, SignatureEncoding, Signer, Verifier};
 
 #[derive(Debug)]
 pub enum VerificationError {
