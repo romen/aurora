@@ -174,6 +174,8 @@ impl Encoder for PrivateKeyInfo2DER {
 impl KeyPair<'_> {
     #[named]
     fn to_PrivateKeyInfoDER(&self, _encoderctx: &EncoderContext) -> OurResult<Vec<u8>> {
+        use pkcs8::der::asn1::{BitStringRef, OctetStringRef};
+
         trace!(target: log_target!(), "{}", "Called!");
 
         debug!(target: log_target!(), "Got keypair: {self:?}");
@@ -194,12 +196,14 @@ impl KeyPair<'_> {
                 return Err(OurError::from(e));
             }
         };
+        let der_sk_octstr = OctetStringRef::new(der_sk_bytes.as_slice())?;
 
-        let aid = AlgorithmIdentifier {
+        let aid = AlgorithmIdentifier::<()> {
             oid: super::OID_PKCS8,
             parameters: None,
         };
-        let pki = pkcs8::PrivateKeyInfo::new(aid, &der_sk_bytes);
+        let pki: pkcs8::PrivateKeyInfo<(), &OctetStringRef, BitStringRef<'_>> =
+            pkcs8::PrivateKeyInfo::new(aid, der_sk_octstr);
         assert_eq!(pki.version(), pkcs8::Version::V1);
 
         pki.to_der().map_err(|e| {
@@ -232,11 +236,11 @@ impl KeyPair<'_> {
                 anyhow!("Error: {e:?}")
             })?;
 
-        let aid = AlgorithmIdentifier {
+        let aid = AlgorithmIdentifier::<()> {
             oid: super::OID_PKCS8,
             parameters: None,
         };
-        let spki = pkcs8::spki::SubjectPublicKeyInfoOwned {
+        let spki: pkcs8::spki::SubjectPublicKeyInfo<(), _> = pkcs8::spki::SubjectPublicKeyInfo {
             algorithm: aid,
             subject_public_key: bitstring,
         };

@@ -294,7 +294,7 @@ pub(super) unsafe extern "C" fn decodePrivateKeyInfo(
     // https://docs.openssl.org/3.2/man7/property/#global-and-local
     // debug!(target: log_target!(), "Using properties: {:?}", decoderctx.properties);
 
-    let pki = pkcs8::PrivateKeyInfo::try_from(bytes.as_ref());
+    let pki = pkcs8::PrivateKeyInfoRef::try_from(bytes.as_ref());
 
     let pki = match pki {
         Ok(pki) => pki,
@@ -321,7 +321,7 @@ pub(super) unsafe extern "C" fn decodePrivateKeyInfo(
         return STOP_DECODING_PROCESS;
     }
 
-    let derprivkey = pki.private_key;
+    let derprivkey = pki.private_key.as_bytes();
     let pair = match keymgmt_functions::PrivateKey::from_DER(derprivkey) {
         Ok(pair) => pair,
         Err(e) => {
