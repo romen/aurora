@@ -991,6 +991,8 @@ checksum = "c008b2c8b5dd1147521fa2ea45e54f5518513bd7ac9b6bf0b882dea581fe8c1b"
 dependencies = [
  "bindgen",
  "cc",
+ "cfg-if",
+ "cpufeatures",
  "generic-array",
  "rand",
  "signature",
