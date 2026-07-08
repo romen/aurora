@@ -985,9 +985,9 @@ dependencies = [
 
 [[package]]
 name = "mldsa-native-rs"
-version = "0.0.1-alpha.5"
+version = "0.0.1-alpha.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c008b2c8b5dd1147521fa2ea45e54f5518513bd7ac9b6bf0b882dea581fe8c1b"
+checksum = "04e0991fd1c1ee458489f3cf5f49e206e531c1621fa6e89110946e5c9d37aee9"
 dependencies = [
  "bindgen",
  "cc",
