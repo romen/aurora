@@ -1493,6 +1493,7 @@ dependencies = [
  "ed25519-dalek",
  "env_logger",
  "function_name",
+ "git2",
  "itertools 0.15.0",
  "lazy_static",
  "libc",

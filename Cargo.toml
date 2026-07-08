@@ -33,7 +33,7 @@ env_logger = ["dep:env_logger"]
 skip_troublesome_wycheproof = []
 export = []
 native = ["mldsa-native-rs?/native"]
-built_info = ["dep:built", "mldsa-native-rs?/built_info"]
+built_info = ["dep:built", "dep:git2", "mldsa-native-rs?/built_info"]
 
 # One (and not more than one!) of the _draft_N features must be enabled to support `_composite_mldsa_eddsa`!
 # These features are _experimental_: they will be removed in an upcoming release once the composite_sigs draft graduates to RFC.
@@ -117,9 +117,14 @@ typenum = { version = "1.20.1", optional = true }
 
 [build-dependencies]
 rasn-compiler = "0.16"
-#`built` generates $OUT_DIR/built.rs; the `git2` feature adds GIT_DIRTY,
-# GIT_COMMIT_HASH, etc. 
+# `built` generates $OUT_DIR/built.rs; the `git2` feature adds GIT_DIRTY,
+# GIT_COMMIT_HASH, etc.
 built = { version = "0.8.0", features = ["git2"], optional = true }
+# Used directly by build.rs to detect repo presence and working-tree dirtiness
+# so we can tune the rerun-if-changed policy. Shares libgit2 with built/git2.
+# default-features = false keeps network/ssh features (and their heavier deps)
+# out; local repo status does not need them.
+git2 = { version = "0.20.4", default-features = false, optional = true }
 
 [dev-dependencies]
 regex = "1"
