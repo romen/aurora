@@ -17,17 +17,17 @@ name = "aurora"
 [features]
 # default = ["env_logger", "export"]
 default = [
-  "env_logger",
-  "built_info",
-  "default_adapters",
-  "_composite_sigs_draft_13",
+    "env_logger",
+    "built_info",
+    "default_adapters",
+    "_composite_sigs_draft_13",
 ]
 default_adapters = [
-  "libcrux_adapter",
-  "rustcrypto_adapter",
-  "slhdsa_c_adapter",
-  "mldsa_native_adapter",
-  #"pqclean_adapter",
+    "libcrux_adapter",
+    "rustcrypto_adapter",
+    "slhdsa_c_adapter",
+    "mldsa_native_adapter",
+    #"pqclean_adapter",
 ]
 env_logger = ["dep:env_logger"]
 skip_troublesome_wycheproof = []
@@ -50,29 +50,29 @@ _build_cdylib_before_integration_tests = []
 
 libcrux_adapter = ["dep:libcrux-kem", "_mlkem_hybrids"]
 pqclean_adapter = [
-  "dep:pqcrypto-mldsa",
-  "dep:pqcrypto-traits",
-  "dep:ml-dsa",
-  "dep:ed25519-dalek",
-  "dep:sha2",
-  "_transcoders_deps",
-  "_mldsa",
-  "_composite_mldsa_eddsa",
+    "dep:pqcrypto-mldsa",
+    "dep:pqcrypto-traits",
+    "dep:ml-dsa",
+    "dep:ed25519-dalek",
+    "dep:sha2",
+    "_transcoders_deps",
+    "_mldsa",
+    "_composite_mldsa_eddsa",
 ]
-rustcrypto_adapter = ["dep:slh-dsa",  "dep:typenum", "dep:der", "_transcoders_deps", "_slhdsa"]
+rustcrypto_adapter = ["dep:slh-dsa", "dep:typenum", "dep:der", "_transcoders_deps", "_slhdsa"]
 slhdsa_c_adapter = [
-  "dep:slhdsa-c-rs",
-  "dep:der",
-  "_transcoders_deps",
-  "_slhdsa",
+    "dep:slhdsa-c-rs",
+    "dep:der",
+    "_transcoders_deps",
+    "_slhdsa",
 ]
 mldsa_native_adapter = [
-  "dep:ed25519-dalek",
-  "dep:mldsa-native-rs",
-  "dep:sha2",
-  "_transcoders_deps",
-  "_mldsa",
-  "_composite_mldsa_eddsa",
+    "dep:ed25519-dalek",
+    "dep:mldsa-native-rs",
+    "dep:sha2",
+    "_transcoders_deps",
+    "_mldsa",
+    "_composite_mldsa_eddsa",
 ]
 
 # This feature is _private_: it collects all the dependencies for transcoders
@@ -86,37 +86,35 @@ _transcoders_deps = ["dep:pem", "dep:pkcs8", "dep:rasn"]
 # Pre-release versions are usually pinned to avoid release churn and due to
 # general lack of semver guarantees.
 [dependencies]
-function_name = "0.3"
-libc = "0.2"
-log = { version = "0.4", features = ["release_max_level_info"] }
-#openssl_provider_forge = { git = "https://github.com/qubip/openssl-provider-forge-rs", tag = "v0.9.0" }
-openssl_provider_forge = "0.10"
-env_logger = { version = "0.11.11", optional = true }
 anyhow = "1.0"
-lazy_static = "1.5.0"
 asn1 = "0.24"
-rand = "0.10"
-rasn = { version = "=0.27.0", optional = true } # pinned: 0.27.1+ requires rustc >= 1.87.0
+cfg-if = "1.0.4"
+constcat = "0.6.1"
 der = { version = "0.8", optional = true }
+ed25519-dalek = { version = "3.0.0", features = ["rand_core"], optional = true }
+env_logger = { version = "0.11.11", optional = true }
+function_name = "0.3"
+itertools = "0.15"
+lazy_static = "1.5.0"
+libc = "0.2"
+libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
+log = { version = "0.4", features = ["release_max_level_info"] }
+ml-dsa = { version = "0.1.1", optional = true }
+mldsa-native-rs = { version = "=0.0.1-alpha.6", optional = true }                # pinned: pre-release
+openssl_provider_forge = "0.10"
 pem = { version = "3.0.6", optional = true }
 pkcs8 = { version = "0.11", features = ["alloc"], optional = true }
-ed25519-dalek = { version = "3.0.0", features = ["rand_core"], optional = true }
-ml-dsa = { version = "0.1.1", optional = true }
-slh-dsa = { version = "=0.2.0-rc.5", optional = true } # pinned: pre-release
-libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
-slhdsa-c-rs = { version = "0.0.5", optional = true }
 pqcrypto-mldsa = { version = "0.1.2", optional = true }
 pqcrypto-traits = { version = "0.3.5", optional = true }
-mldsa-native-rs = { version = "=0.0.1-alpha.6", optional = true } # pinned: pre-release
+rand = "0.10"
+rasn = { version = "=0.27.0", optional = true }                     # pinned: 0.27.1+ requires rustc >= 1.87.0
 sha2 = { version = "0.11", optional = true }
-itertools = "0.15"
-constcat = "0.6.1"
-cfg-if = "1.0.4"
 signature = { version = "3.0.0", features = ["alloc"] }
+slh-dsa = { version = "=0.2.0-rc.5", optional = true }              # pinned: pre-release
+slhdsa-c-rs = { version = "0.0.5", optional = true }
 typenum = { version = "1.20.1", optional = true }
 
 [build-dependencies]
-rasn-compiler = "0.16"
 # `built` generates $OUT_DIR/built.rs; the `git2` feature adds GIT_DIRTY,
 # GIT_COMMIT_HASH, etc.
 built = { version = "0.8.0", features = ["git2"], optional = true }
@@ -125,10 +123,11 @@ built = { version = "0.8.0", features = ["git2"], optional = true }
 # default-features = false keeps network/ssh features (and their heavier deps)
 # out; local repo status does not need them.
 git2 = { version = "0.20.4", default-features = false, optional = true }
+rasn-compiler = "0.16"
 
 [dev-dependencies]
-regex = "1"
-tempfile = "3"
-serde_json = "1.0.150"
 paste = "1.0"
+regex = "1"
+serde_json = "1.0.150"
+tempfile = "3"
 wycheproof = { git = "https://github.com/eferollo/wycheproof-rs", branch = "composite-mldsa-draft13" }
