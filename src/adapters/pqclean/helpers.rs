@@ -16,13 +16,20 @@
 //! regardless of the deprecation.
 //!
 //! The deprecated API is confined to the two wrappers below:
-//! - [`foreign_secret_key_from_expanded_bytes`]
-//! - [`foreign_expanded_bytes_from_seed`]
+//! - `foreign_secret_key_from_expanded_bytes`
+//! - `foreign_expanded_bytes_from_seed`
+
+/* ##### imports ##### */
 
 use function_name::named;
 use ml_dsa as foreign_mldsa_module;
 
+/* ##### constants ##### */
+
+const VALIDATE_PRIVKEY_DECODING_VIA_FOREIGN_MODULE: bool = true;
 pub(super) const ML_DSA_SEED_SIZE: usize = 32;
+
+/* ##### types, traits + their impls ##### */
 
 pub(super) type MlDsaSeed = [u8; ML_DSA_SEED_SIZE];
 
@@ -42,6 +49,70 @@ impl SupportedMlDsaSecretKey for pqcrypto_mldsa::mldsa65::SecretKey {
 impl SupportedMlDsaSecretKey for pqcrypto_mldsa::mldsa87::SecretKey {
     type ForeignParamSet = foreign_mldsa_module::MlDsa87;
     type PublicKey = pqcrypto_mldsa::mldsa87::PublicKey;
+}
+
+/* ##### (crate-)public API ##### */
+
+/// Decode the bytes as a secret key, deriving from seed if necessary
+#[named]
+pub(super) fn decode_mldsa_secret_key<T>(bytes: &[u8]) -> Option<T>
+where
+    T: SupportedMlDsaSecretKey,
+{
+    // First we check if the EncodedBytes match the expected length for seed format
+    match TryInto::<&MlDsaSeed>::try_into(bytes) {
+        Ok(seed) => {
+            return derive_mldsa_secret_key_from_seed(seed);
+        }
+        Err(_) => (),
+    }
+
+    // If we reach here, the key was not in seed format, and we expect an
+    // expanded private key
+
+    if VALIDATE_PRIVKEY_DECODING_VIA_FOREIGN_MODULE {
+        // Currently PQClean is too lenient in parsing private keys.
+        // We use a more strict-on-decode foreign module to try and correctly decode
+        // the input, before asking PQClean to decode.
+        let foreign_result = foreign_secret_key_from_expanded_bytes::<T>(bytes);
+
+        match foreign_result {
+            Ok(_) => (), // we discard the foreign module object
+            Err(e) => {
+                if let Some(s) = e.downcast_ref::<&str>() {
+                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey: {s}");
+                } else if let Some(s) = e.downcast_ref::<String>() {
+                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey: {s}");
+                } else {
+                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey");
+                }
+                return None;
+            }
+        }
+
+        // Finally if we reached this point we know that the `foreign_mldsa_module`
+        // could decode the EncodedPrivateKey. We can proceed with the lenient
+        // decoding routines of PQClean
+    }
+
+    T::from_bytes(bytes).ok()
+}
+
+/// Derive the expanded secret key from a seed
+#[named]
+pub(super) fn derive_mldsa_secret_key_from_seed<T>(seed: &MlDsaSeed) -> Option<T>
+where
+    T: SupportedMlDsaSecretKey,
+{
+    let key_bytes = foreign_expanded_bytes_from_seed::<T>(seed);
+    let res = <T as pqcrypto_traits::sign::SecretKey>::from_bytes(&key_bytes);
+    match res {
+        Ok(sk) => Some(sk),
+        Err(e) => {
+            error!(target: log_target!(), "Failed to derive the expanded private key from the seed: {e:?}");
+            return None;
+        }
+    }
 }
 
 /// Derive the matching public key from a secret key
@@ -83,42 +154,7 @@ where
     }
 }
 
-/// Derive the expanded secret key from a seed
-#[named]
-pub(super) fn derive_mldsa_secret_key_from_seed<T>(seed: &MlDsaSeed) -> Option<T>
-where
-    T: SupportedMlDsaSecretKey,
-{
-    let key_bytes = foreign_expanded_bytes_from_seed::<T>(seed);
-    let res = <T as pqcrypto_traits::sign::SecretKey>::from_bytes(&key_bytes);
-    match res {
-        Ok(sk) => Some(sk),
-        Err(e) => {
-            error!(target: log_target!(), "Failed to derive the expanded private key from the seed: {e:?}");
-            return None;
-        }
-    }
-}
-
-/// Produce the expanded-form encoding of a foreign ML-DSA signing key
-/// derived from a seed.
-///
-/// Wraps `ml-dsa`'s deprecated `ExpandedSigningKey::to_expanded`.
-///
-/// See the module note on why the deprecated API is used.
-fn foreign_expanded_bytes_from_seed<T>(
-    seed: &MlDsaSeed,
-) -> foreign_mldsa_module::ExpandedSigningKeyBytes<T::ForeignParamSet>
-where
-    T: SupportedMlDsaSecretKey,
-{
-    let foreign_key =
-        <foreign_mldsa_module::ExpandedSigningKey<T::ForeignParamSet>>::from_seed(seed.into());
-    #[allow(deprecated)]
-    let key_bytes = foreign_key.to_expanded();
-
-    key_bytes
-}
+/* ##### private foreign-module wrappers ##### */
 
 /// Decode a foreign ML-DSA signing key from its expanded-form raw bytes
 /// encoding.
@@ -175,49 +211,22 @@ where
     result
 }
 
-const VALIDATE_PRIVKEY_DECODING_VIA_FOREIGN_MODULE: bool = true;
-
-/// Decode the bytes as a secret key, deriving from seed if necessary
-#[named]
-pub(super) fn decode_mldsa_secret_key<T>(bytes: &[u8]) -> Option<T>
+/// Produce the expanded-form encoding of a foreign ML-DSA signing key
+/// derived from a seed.
+///
+/// Wraps `ml-dsa`'s deprecated `ExpandedSigningKey::to_expanded`.
+///
+/// See the module note on why the deprecated API is used.
+fn foreign_expanded_bytes_from_seed<T>(
+    seed: &MlDsaSeed,
+) -> foreign_mldsa_module::ExpandedSigningKeyBytes<T::ForeignParamSet>
 where
     T: SupportedMlDsaSecretKey,
 {
-    // First we check if the EncodedBytes match the expected length for seed format
-    match TryInto::<&MlDsaSeed>::try_into(bytes) {
-        Ok(seed) => {
-            return derive_mldsa_secret_key_from_seed(seed);
-        }
-        Err(_) => (),
-    }
+    let foreign_key =
+        <foreign_mldsa_module::ExpandedSigningKey<T::ForeignParamSet>>::from_seed(seed.into());
+    #[allow(deprecated)]
+    let key_bytes = foreign_key.to_expanded();
 
-    // If we reach here, the key was not in seed format, and we expect an
-    // expanded private key
-
-    if VALIDATE_PRIVKEY_DECODING_VIA_FOREIGN_MODULE {
-        // Currently PQClean is too lenient in parsing private keys.
-        // We use a more strict-on-decode foreign module to try and correctly decode
-        // the input, before asking PQClean to decode.
-        let foreign_result = foreign_secret_key_from_expanded_bytes::<T>(bytes);
-
-        match foreign_result {
-            Ok(_) => (), // we discard the foreign module object
-            Err(e) => {
-                if let Some(s) = e.downcast_ref::<&str>() {
-                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey: {s}");
-                } else if let Some(s) = e.downcast_ref::<String>() {
-                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey: {s}");
-                } else {
-                    error!(target: log_target!(), "Failed to decode the EncodedPrivateKey");
-                }
-                return None;
-            }
-        }
-
-        // Finally if we reached this point we know that the `foreign_mldsa_module`
-        // could decode the EncodedPrivateKey. We can proceed with the lenient
-        // decoding routines of PQClean
-    }
-
-    T::from_bytes(bytes).ok()
+    key_bytes
 }
