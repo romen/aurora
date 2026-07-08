@@ -203,6 +203,15 @@ impl AdapterContextTrait for MldsaNativeAdapter {
 #[named]
 pub fn init(handle: &mut super::AdaptersHandle) -> Result<(), OurError> {
     trace!(target: log_target!(), "{}", "Called!");
+
+    #[cfg(feature = "built_info")]
+    {
+        use mldsa_native_rs::built_info::BuiltInfo;
+
+        let info = BuiltInfo::new();
+        log::info!(target: log_target!(), "{}::builtinfo::BuiltInfo\n{:#?}", "mldsa_native_rs", info);
+    }
+
     let ourctx = MldsaNativeAdapter {};
     handle.register_adapter(ourctx);
     Ok(())

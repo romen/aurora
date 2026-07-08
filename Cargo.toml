@@ -33,7 +33,7 @@ env_logger = ["dep:env_logger"]
 skip_troublesome_wycheproof = []
 export = []
 native = ["mldsa-native-rs?/native"]
-built_info = ["dep:built"]
+built_info = ["dep:built", "mldsa-native-rs?/built_info"]
 
 # One (and not more than one!) of the _draft_N features must be enabled to support `_composite_mldsa_eddsa`!
 # These features are _experimental_: they will be removed in an upcoming release once the composite_sigs draft graduates to RFC.
