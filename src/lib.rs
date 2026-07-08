@@ -19,6 +19,9 @@ pub(crate) mod random;
 
 pub(crate) mod asn_definitions;
 
+#[cfg(feature = "built_info")]
+pub mod built_info;
+
 #[cfg(test)]
 pub(crate) mod tests;
 

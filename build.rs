@@ -107,6 +107,9 @@ fn try_main() -> Result<(), Box<dyn Error>> {
 
     println!("cargo::rustc-env=CARGO_GIT_DESCRIBE={}", git_describe);
 
+    #[cfg(feature = "built_info")]
+    built::write_built_file().expect("Failed to acquire build-time information");
+
     Ok(())
 }
 

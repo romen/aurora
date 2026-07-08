@@ -73,6 +73,14 @@ pub extern "C" fn OSSL_provider_init(
     trace!(target: log_target!(), "Just called a 🦀 Rust function from C!");
     trace!(target: log_target!(), "This is 🌌 {} v{}", PROV_NAME, PROV_VER);
 
+    #[cfg(feature = "built_info")]
+    {
+        use crate::built_info::BuiltInfo;
+
+        let info = BuiltInfo::new();
+        log::info!(target: log_target!(), "{}::builtinfo::BuiltInfo\n{:#?}", PROV_NAME, info);
+    }
+
     let core_dispatch = match CoreDispatch::try_from(core_dispatch) {
         Ok(cd) => cd,
         Err(e) => {

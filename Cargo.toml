@@ -18,6 +18,7 @@ name = "aurora"
 # default = ["env_logger", "export"]
 default = [
   "env_logger",
+  "built_info",
   "default_adapters",
   "_composite_sigs_draft_13",
 ]
@@ -32,6 +33,7 @@ env_logger = ["dep:env_logger"]
 skip_troublesome_wycheproof = []
 export = []
 native = ["mldsa-native-rs?/native"]
+built_info = ["dep:built"]
 
 # One (and not more than one!) of the _draft_N features must be enabled to support `_composite_mldsa_eddsa`!
 # These features are _experimental_: they will be removed in an upcoming release once the composite_sigs draft graduates to RFC.
@@ -114,6 +116,9 @@ typenum = { version = "1.20.1", optional = true }
 
 [build-dependencies]
 rasn-compiler = "0.16"
+#`built` generates $OUT_DIR/built.rs; the `git2` feature adds GIT_DIRTY,
+# GIT_COMMIT_HASH, etc. 
+built = { version = "0.8.0", features = ["git2"], optional = true }
 
 [dev-dependencies]
 regex = "1"
