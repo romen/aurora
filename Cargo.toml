@@ -66,7 +66,7 @@ mldsa_native_adapter = [
   "dep:sha2",
   "_transcoders_deps",
   "_mldsa",
-  #"_composite_mldsa_eddsa",
+  "_composite_mldsa_eddsa",
 ]
 
 # This feature is _private_: it collects all the dependecies for transcoders
@@ -87,7 +87,7 @@ rasn = { version = "=0.27.0", optional = true }
 der = { version = "0.7.10", optional = true }
 pem = { version = "3.0.6", optional = true }
 pkcs8 = { version = "0.10.2", features = ["alloc"], optional = true }
-ed25519-dalek = { version = "2.1.1", features = ["rand_core"], optional = true }
+ed25519-dalek = { version = "3.0.0", features = ["rand_core"], optional = true }
 ml-dsa = { version = "=0.1.0-rc.0", optional = true }
 slh-dsa = { version = "0.0.3", optional = true }
 libcrux-kem = { version = "0.0.8", default-features = false, optional = true }
