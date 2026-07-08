@@ -13,8 +13,11 @@ pub(crate) fn setup() -> Result<(), OurError> {
         "release"
     };
 
+    #[cfg(feature = "_build_cdylib_before_integration_tests")]
     build::build_cdylib_before_tests(profile);
+
     env::set_openssl_modules_env_var(profile);
+
     Ok(())
 }
 
@@ -43,6 +46,7 @@ fn try_init_logging() -> Result<(), OurError> {
     Ok(())
 }
 
+#[cfg(feature = "_build_cdylib_before_integration_tests")]
 mod build {
     use super::env::env_bool;
     use std::process::Command;
@@ -135,6 +139,10 @@ mod env {
         )
     }
 
+    #[cfg_attr(
+        not(any(feature = "_build_cdylib_before_integration_tests")),
+        expect(dead_code)
+    )]
     pub(super) fn env_bool(name: &str) -> Option<bool> {
         match std::env::var(name) {
             Ok(v) => match v.trim().to_ascii_lowercase().as_str() {

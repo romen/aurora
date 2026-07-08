@@ -46,6 +46,7 @@ _mldsa = []
 _slhdsa = []
 _mlkem_hybrids = []
 _composite_mldsa_eddsa = []
+_build_cdylib_before_integration_tests = []
 
 libcrux_adapter = ["dep:libcrux-kem", "_mlkem_hybrids"]
 pqclean_adapter = [
